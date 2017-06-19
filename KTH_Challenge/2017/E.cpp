@@ -25,13 +25,15 @@ inline int solve(int mask, int goal, vector<int>& g) {
     
     int res = INF;
     int gs = g.size();
-    for (int i = 0; i < gs; i++) {
+    int i = 0;
+    for (i = 0; i < gs; i++) {
 	if (mask & (1 << (g[i] % SZ))) continue;
-	for (int k = i + 1; k < gs; k++) {
-	    if (mask & (1 << (g[k] % SZ))) continue;
-	    res = min(res, cost[g[i]][g[k]] + solve((mask | (1 << (g[i] % SZ))) |
-						    (1 << (g[k] % SZ)), goal, g));
-	}
+	else break;
+    }
+    for (int k = i + 1; k < gs; k++) {
+	if (mask & (1 << (g[k] % SZ))) continue;
+	res = min(res, cost[g[i]][g[k]] + solve((mask | (1 << (g[i] % SZ))) |
+						(1 << (g[k] % SZ)), goal, g));
     }
     return dp[mask] = res;
 }
