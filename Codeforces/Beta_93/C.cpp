@@ -10,7 +10,7 @@ int main() {
 
     lli dt = t2 - t0;
     if (dt == 0) {
-        if (x1 != x2)
+        if (t1 != t2)
             cout << 0 << " " << x2 << "\n";
         else
             cout << x1 << " " << x2 << "\n";
