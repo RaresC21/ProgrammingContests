@@ -1,2 +1,6 @@
 *.txt
 p.cpp
+a.out
+
+# emacs safe-copy files
+*.*~
