@@ -12,3 +12,5 @@ python run_test.py /path/to/program.cpp /path/to/directory/containing/tests
 Currently, only `C++` is supported.
 
 Output format can be strings, integers or floats. If floats, it will test that difference between expected output and your own is at most `1e-6`. The time limit is set at `2 seconds`. These values can be changed with the variables defined at the top of the `run_test.py` file.
+
+**Requirements:** python 3
