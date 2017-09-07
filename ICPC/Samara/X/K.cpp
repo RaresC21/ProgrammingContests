@@ -52,11 +52,10 @@ int main() {
     for (int i = 0; i < N; i++) {
         while (q.size() && q.top().end <= v[i].a) {
             int k = q.top().k;
-            // cout << dp[k].first << " " << best.first << " " << dp[k].second << " " << best.second.first << "\n";
             if (dp[k].first > best.first) {
                 best.first = dp[k].first;
                 best.second.first = dp[k].second;
-                best.second.second = k; 
+                best.second.second = k;
             } else if (dp[k].first == best.first &&
                         dp[k].second < best.second.first) {
                 best.second.first = dp[k].second;
@@ -64,8 +63,6 @@ int main() {
             }
             q.pop();
         }
-
-        // cout << i + 1 << " " << best.first << "\n";
 
         dp[i].first = best.first + v[i].u;
         dp[i].second = best.second.first + v[i].b - v[i].a;
