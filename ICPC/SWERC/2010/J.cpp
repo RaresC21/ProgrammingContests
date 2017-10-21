@@ -21,26 +21,11 @@ typedef pair<LL,LL> pll;
 
 const int N = 3;
 
-void print(vector< vector<double> > A) {
-    int n = A.size();
-    for (int i=0; i<n; i++) {
-        for (int j=0; j<n+1; j++) {
-            cout << A[i][j] << "\t";
-            if (j == n-1) {
-                cout << "| ";
-            }
-        }
-        cout << "\n";
-    }
-    cout << endl;
-}
-
 bool gauss(vector< vector<double> > A) {
     int n = A.size();
     int m = SZ(A[0]);
 
     for (int i=0; i<n; i++) {
-	//	print(A);
         // Search for maximum in this column
         double maxEl = abs(A[i][i]);
         int maxRow = i;
@@ -74,15 +59,14 @@ bool gauss(vector< vector<double> > A) {
     // Solve equation Ax=b for an upper triangular matrix A
     vector<double> x(n);
     for (int i=n-1; i>=0; i--) {
-        x[i] = A[i][n]/A[i][i];
-	if (x[i] == 0) x[i] = 0.01;
+        if (fabs(A[i][n] / A[i][i]) == 1 && fabs(A[i][n] - A[i][i]) < 1e-13) x[i] = 0.0001; 
+        else x[i] = A[i][n]/A[i][i];
+	if (x[i] <= 1e-8) x[i] = 0.01;
         for (int k=i-1;k>=0; k--) {
             A[k][n] -= A[k][i] * x[i];
         }
     }
 
-    //    print (A);
-    //cout << x[0] << " " << x[1] << " " << x[2] << "\n";
     FOR(i,0,N) if (x[i] <= 0 || x[i] >= 1) return false;
     if (fabs(x[0] + x[1] + x[2] - 1.0) > 1e-8) return false;
     
