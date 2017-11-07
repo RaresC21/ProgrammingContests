@@ -1,9 +1,17 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+
 /*
+	gradient of (function we want to minimize/maximize) = lambda * (gradient of (constraint function))
+*/
+
+
+/*
+	Example problem:
+
 	Suppose you are in a 2D world. Your are in a system
-	of N parallel zones in which you are allowed 
+	of N parallel zones in which you are allowed
 	to travel at different maximum speeds in any direction
 	Width of each zone is 100 along the Y. You are currently at
 	the origin and want to reach (100 * N, D)
@@ -18,8 +26,7 @@ start* ----------------------------
 */
 
 /*
-	gradient of (function we want to minimize/maximize) = lambda * (gradient of (constraint function))
-
+	Solution:
 	Say that you travel di meters in the x direction within zone i.
 	Then, we have the restriction that d1 + d2 + ... + dn = D
 	We want to minimize the sum of sqrt(di^2 + 100^2) / vi for i = 1 to n
@@ -68,7 +75,7 @@ int main() {
 			if (cur < D) {
 				minim = lambda;
 			} else {
-				maxim = lambda;	
+				maxim = lambda;
 			}
 		}
 
