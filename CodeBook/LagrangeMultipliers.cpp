@@ -68,7 +68,7 @@ int main() {
 			mm = max(mm, v[i]);
 		}
 
-		double minim = 0, maxim = 1 / mm;
+		double minim = 0, maxim = 1 / mm; // set correct bounds. Cant' have square root of a negative
 		for (int aa = 0; aa < 400; aa++) {
 			double lambda = (minim + maxim) / 2;
 			double cur = evaluate(lambda);
