@@ -5,38 +5,6 @@ using namespace std;
 #define MAX 10000
 typedef long long int lli;
 
-// returns a^x mod p
-lli exponent_(lli a, lli x, lli p) {
-    lli ans = 1;
-    while (x > 0) {
-        if (x % 2 == 1)
-            ans = (ans * a) % p;
-        x /= 2;
-        a = (a * a) % p;
-    }
-    return ans;
-}
-
-lli modular_inverse_(lli a, lli b, lli p) {
-    return ((a % p) * (exponent_(b, p - 2, p) % p)) % p;
-}
-
-// return a % b (positive value)
-int mod(int a, int b) {
-    return ((a%b) + b) % b;
-}
-
-// computes gcd(a,b)
-int gcd(int a, int b) {
-    while (b) { int t = a%b; a = b; b = t; }
-    return a;
-}
-
-// computes lcm(a,b)
-int lcm(int a, int b) {
-    return a / gcd(a, b)*b;
-}
-
 // returns g = gcd(a, b); finds x, y such that d = ax + by
 int extended_euclid(int a, int b, int &x, int &y) {
     int xx = y = 0;
@@ -61,14 +29,6 @@ vector<int> modular_linear_equation_solver(int a, int b, int n) {
             ret.push_back(mod(x + i*(n / g), n));
     }
     return ret;
-}
-
-// computes b such that ab = 1 (mod n), returns -1 on failure
-int mod_inverse(int a, int n) {
-    int x, y;
-    int g = extended_euclid(a, n, x, y);
-    if (g > 1) return -1;
-    return mod(x, n);
 }
 
 // find z such that  z % m1 = r1, z % m2 = r2.
@@ -120,42 +80,6 @@ bool linear_diophantine(int a, int b, int c, int &x, int &y) {
     return true;
 }
 
-int is_prime[MAX+1];
-vector<int> primes;
-void calc_primes () {
-    for (int i = 2; i <= MAX; i++) is_prime[i] = true;
-    for (int i = 2; i*i < MAX; i++) {
-        if (!is_prime[i]) continue;
-        for (int k = i+i; k <= MAX; k += i)
-            is_prime[k] = false;
-        primes.push_back(i);
-    }
-}
-
-lli fact[MAX];
-void calculate_factorial() {
-	fact[0] = 1;
-	for (int i = 1; i < MAX; i++)
-		fact[i] = fact[i - 1] * i;
-}
-
-// (r choose n) mod p
-lli combinatorics_(lli n, lli r, lli p) {
-	return (modular_inverse_(fact[n], (fact[r] * fact[n - r]) % p, p)) % p;
-}
-
-// pascal's triangle to get exact values for combinatorics.
-// n choose k
-lli C[MAX];
-lli pascal_comb_(lli n, int k) {
-	for (int j = 0; j < MAX; j++) C[j] = 0;
-	C[0] = 1;  // nC0 is 1
-	for (int i = 1; i <= n; i++)
-		for (lli j = min(i, k); j > 0; j--)
-			C[j] = C[j] + C[j - 1];
-	return C[k];
-}
-
 // A O(n^2) time and O(n^2) extra space method for Pascal's Triangle
 lli pascal_triangle[MAX][MAX];
 void make_pascal(int n) {
@@ -167,27 +91,6 @@ void make_pascal(int n) {
                 pascal_triangle[line][i] = pascal_triangle[line-1][i-1] + pascal_triangle[line-1][i];
         }
     }
-}
-
-lli binomialCo(int N, int r) {
-    lli res = 1;
-    r=(r<(N-r))?r:(N-r);
-    for(int i = 1; i <= r; i++, N--) {
-        res *= N;
-        res /= i;
-    }
-    return res;
-}
-
-// we need to multiply the numbers in vector a and those in vector b
-// then determine which product is bigger. return true if a > b;
-bool compare_product(vector<lli> a, vector<lli> b) {
-    // assumes all values in a and b are positive.
-    double logA = 0, logB = 0;
-    for (int i = 0; i < a.size(); i++) logA += log10(a[i]);
-    for (int i = 0; i < b.size(); i++) logB += log10(b[i]);
-    if (logA > logB) return true;
-    return false;
 }
 
 // create list of primitive pythagorean triples
@@ -242,35 +145,6 @@ void eulerSieve (int N) {
 
     gcd(F(n), F(m)) = F(gcd(n, m))
 */
-void multiply_fibo(lli F[2][2], lli M[2][2]) {
-    lli x = F[0][0] * M[0][0] + F[0][1] * M[1][0];
-    lli y = F[0][0] * M[0][1] + F[0][1] * M[1][1];
-    lli z = F[1][0] * M[0][0] + F[1][1] * M[1][0];
-    lli w = F[1][0] * M[0][1] + F[1][1] * M[1][1];
-
-    F[0][0] = x%MOD;
-    F[0][1] = y%MOD;
-    F[1][0] = z%MOD;
-    F[1][1] = w%MOD;
-}
-
-void power_fibo(lli F[2][2], lli n) {
-    if (n == 0 || n == 1) return;
-    lli M[2][2] = { { 1,1 }, { 1,0 } };
-
-    power_fibo(F, n / 2);
-    multiply_fibo(F, F);
-    if (n % 2 != 0)
-        multiply_fibo(F, M);
-}
-
-lli fib(lli n) {
-    lli F[2][2] = {{ 1,1 }, { 1,0 }};
-    if (n == 0)
-        return 0;
-    power_fibo(F, n - 1);
-    return F[0][0];
-}
 
 // the n-th s-gonal number;
 lli polygonal_number(int n, int s) {
@@ -300,8 +174,6 @@ lli first_kind_stirling(int n, int k)  { // initialize firstStirling to -1 for a
 }
 
 // evaluate (1^m + 2^m + ... + n^m) % MOD
-
-
 int normal(int n) {
     n %= MOD;
     (n < 0) && (n += MOD);
@@ -347,8 +219,3 @@ int power_sum(int n, int k) {
 
     n-th harmonic number approximated by ln(n)
 */
-
-int main() {
-
-    return 0;
-}

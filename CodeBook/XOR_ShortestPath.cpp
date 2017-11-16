@@ -1,4 +1,4 @@
-/* 
+/*
    /home/rares/ProgrammingContests/Codeforces/Educational_27/
    G.cpp
 */
@@ -41,7 +41,7 @@ void dfs(int node) {
 }
 
 int main() {
-    
+
     int N, M; cin >> N >> M;
     for (int i = 0; i < M; i++) {
 		int x, y, w; cin >> x >> y >> w;
@@ -57,6 +57,6 @@ int main() {
     }
 
     cout << ans << "\n";
-    
+
     return 0;
 }
