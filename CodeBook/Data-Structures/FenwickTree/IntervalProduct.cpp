@@ -1,3 +1,7 @@
+/*
+    determine if the product of the numbers within some query ranges is positive, zero, or negative
+*/
+
 #include <bits/stdc++.h>
 using namespace std;
 
