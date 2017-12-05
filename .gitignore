@@ -1,6 +1,6 @@
 *.txt
 p.cpp
-a.out
+*.out
 
 # emacs safe-copy files
 *.*~
