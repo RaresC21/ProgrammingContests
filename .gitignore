@@ -1,4 +1,5 @@
-*.txt
+input.txt
+ans.txt
 p.cpp
 *.out
 
