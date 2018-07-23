@@ -11,7 +11,7 @@ Currently starting to include some data structures. Segment Trees are comprehens
 
 ## Automatically Compile and Run
 
-###### I have included an `initc++.txt` file  with starting configuration (macros defined, etc. etc. check it out), as well as a `makefile` included in the `template` folder.
+I have included an `initc++.txt` file  with starting configuration (macros defined, etc. etc. check it out), as well as a `makefile` included in the `template` folder.
 
 When competing, I use a single file called `p.cpp` to write my code in. To run and compile it, using input from a file called `input.txt`, I have included a `makefile`. Simply run
 
