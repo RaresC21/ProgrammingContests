@@ -64,7 +64,7 @@ int main() {
           UU[k] = min(UU[k], U[i]);
           DD[k] = min(DD[k], D[i]);
         }
-      } else 
+      } else {
         for (int k = R[i]; k < L[i]; k++) {
           UU[k] = min(UU[k], D[i]);
           DD[k] = min(DD[k], U[i]);
@@ -76,15 +76,15 @@ int main() {
     for (int i = 0; i < 100; i++) {
       double mid = (minim + maxim) / 2;
       if (solve(mid)) {
-	      maxim = mid;
+	maxim = mid;
       } else {
-	      minim = mid;
+	minim = mid;
       }
     }
-
+    
     cout << "Case #" << t << ": ";
     cout << fixed << setprecision(6) << minim << "\n";
   }
- 
+  
   return 0;
 }
