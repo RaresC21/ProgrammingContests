@@ -1,3 +1,9 @@
+/*
+ There are N points in a plane whose coordinates are natural numbers. A convex polygon with maximal number of vertices is a convex polygon whose vertices are some of given points and the origin having maximal possible number of vertices. Origin, i.e. point with coordinates (0,0), must be one of vertices of a convex polygon with maximal number of vertices.
+
+Write a program that will determine number of vertices in such polygon.
+*/
+
 #include <bits/stdc++.h>
 using namespace std;
 
