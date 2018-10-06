@@ -22,6 +22,11 @@ struct line {
   double a, b, c;
   line(): a(0), b(0), c(0) {} //invalid or uninitialized line
   line(double A, double B, double C) : a(A), b(B), c(C) {}
+  Line (const PT& p, const PT& q) {
+    A = q.Y - p.Y;
+    B = p.X - q.X;
+    C = -1 * (A * p.X + B * p.Y);
+  }
 
   //solve for y, given x
   //for vertical lines, either +inf, -inf, or nan is returned

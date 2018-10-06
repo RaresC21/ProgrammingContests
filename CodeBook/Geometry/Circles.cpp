@@ -56,6 +56,18 @@ vector <PT> line_circle(PT a, PT b, PT c, double r) {
     return ret;
 }
 
+// find two points of intersection between two circles
+// assumes that the circles indeed intersect. 
+pair<PT, PT> circle_circle(const Circle& c1, const Circle& c2) {
+  double d = dist(c1.cntr, c2.cntr);
+  double theta = acos((c1.R*c1.R + d*d - c2.R*c2.R) / (2*c1.R*d));
+  
+  PT b = c2.cntr - c1.cntr;
+  PT pt1 = rotate_ccw(b, theta) * (c1.R / d);
+  PT pt2 = rotate_ccw(pt1, 2*PI - 2*theta);
+  return make_pair(c1.cntr + pt1, c1.cntr + pt2);
+}
+
 //  compute center of circle given three points
 pair<PT, double> circle_center(const PT& a, const PT& b, const PT& c) {
     PT ab = (a + b) / double(2);
