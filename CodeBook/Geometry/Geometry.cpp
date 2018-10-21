@@ -2,10 +2,6 @@
 using namespace std;
 typedef complex<double> PT;
 
-/* TODO : Centroid
-          Circle Tangents
-*/
-
 const double eps = 1e-9;
 #define A first
 #define B second
@@ -81,6 +77,15 @@ bool is_on_segment(const PT& p, const PT& a, const PT& b) {
     return abs(abs(a - p) + abs(b - p) - abs(a - b)) < eps;
 }
 
+bool segments_intersect(const PT& a, const PT& b, const PT& p, const PT& q) {
+  PT isect;
+  if (line_line(a, b, p, q, isect)) {
+    return is_on_segment(isect, a, b) && is_on_segment(isect, p, q);
+  } else {
+    return false;
+  }
+}
+
 //  reflect p around line a-b
 PT reflect(const PT& p, const PT& a, const PT& b) {
     PT z = p - a;
@@ -153,6 +158,7 @@ bool is_on_polygon(const PT& a, const vector<PT> &p) {
     return false;
 }
 
+// O(n)
 //  whether PT a is inside a simple polygon p
 bool is_in_polygon(const PT& a, const vector<PT> &p) {
     double sum = 0;
@@ -160,6 +166,39 @@ bool is_in_polygon(const PT& a, const vector<PT> &p) {
         sum += angle(p[i], a, p[(i + 1) % (int)p.size()]);
     }
     return abs(abs(sum) - 2*M_PI) < eps;
+}
+
+// O(log n)
+bool in_polygon(const vector<PT>& v, const PT& p) {
+  if (cross(v[1] - v[0], p - v[0]) < -eps ||
+      cross(v[0] - v.back(), p - v.back()) < -eps) {
+    return false;
+  }
+
+  int l = 0, r = v.size() - 1;
+  while (l != r - 1) {
+    int mid = (l + r) / 2;
+    if (cross(v[mid] - v[0], p - v[0]) > 0) {
+      l = mid;
+    } else {
+      r = mid;
+    }
+  }
+  return cross(v[r] - v[l], p - v[l]) > -eps;
+}
+
+// tests whether or not a given polygon (in CW or CCW order) is simple
+bool simple(const vector<PT> &p) {
+  for (int i = 0; i < p.size(); i++) {
+    for (int k = i + 1; k < p.size(); k++) {
+      int j = (i + 1) % p.size();
+      int l = (k + 1) % p.size();
+      if (i == l || j == k) continue;
+      if (segments_intersect(p[i], p[j], p[k], p[l]))
+	return false;
+    }
+  }
+  return true;
 }
 
 //  area of a simple polygon p
