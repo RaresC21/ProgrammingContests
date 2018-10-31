@@ -1,4 +1,9 @@
 
+/*
+  Polygon is given in clockwise order.
+  second = true/false. gives one tangent and the other
+*/
+
 int nxt(int i, int num_v) { return (i + 1) % num_v; }
 int prev(int i, int num_v) { return (i - 1 + num_v) % num_v; }
 
