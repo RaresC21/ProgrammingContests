@@ -2,7 +2,7 @@
 int nxt(int i, int num_v) { return (i + 1) % num_v; }
 int prev(int i, int num_v) { return (i - 1 + num_v) % num_v; }
 
-double dir(const PT& p, const PT& q, const PT& r, bool second) {
+int dir(const PT& p, const PT& q, const PT& r, bool second) {
   if (!second) return cross(q-p,r-p) >= -eps;
   return cross(q-p,r-p) <= eps;
 }
