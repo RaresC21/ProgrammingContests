@@ -57,11 +57,11 @@ vector <PT> line_circle(PT a, PT b, PT c, double r) {
 }
 
 // find two points of intersection between two circles
-// assumes that the circles indeed intersect. 
+// assumes that the circles indeed intersect.
 pair<PT, PT> circle_circle(const Circle& c1, const Circle& c2) {
   double d = dist(c1.cntr, c2.cntr);
   double theta = acos((c1.R*c1.R + d*d - c2.R*c2.R) / (2*c1.R*d));
-  
+
   PT b = c2.cntr - c1.cntr;
   PT pt1 = rotate_ccw(b, theta) * (c1.R / d);
   PT pt2 = rotate_ccw(pt1, 2*PI - 2*theta);
@@ -117,18 +117,18 @@ pair<Segment,Segment> solve(circle a, circle b){
 
 // find center of a circle of radius R that is tangent to both circles centered
 // at a and b with radii r1, r2, respectively.
-// need: rotate_ccw
 pair<PT, PT> circle_tangent(PT a, double r1, PT b, double r2, double R) {
   double v = R + r2;
   double u = R + r1;
   double d = abs(a - b);
   double theta = acos((u*u + d*d - v*v) / (2*u*d));
 
-  PT p1 = rotate_ccw(b, a, theta);
-  PT p2 = rotate_ccw(b, a, -theta);
-  p1 = p1 * (u / abs(p1 - a));
-  p2 = p2 * (u / abs(p2 - a));
-  return MP(p1, p2);
+  PT p1 = rotate_ccw(b, a, theta) - a;
+  PT p2 = rotate_ccw(b, a, -theta) - a;
+
+  p1 = p1 * (u / abs(p1));
+  p2 = p2 * (u / abs(p2));
+  return mp(p1 + a, p2 + a);
 }
 
 // The Great-Circle Distance between any two points A and B on sphere
@@ -163,17 +163,56 @@ double spherical_cap_area(double R, double h) {
     return 2 * PI * R * h;
 }
 
-int main() {
-  // circle c(-2, 5, sqrt(10)); //(x+2)^2+(y-5)^2=10
-  // assert(c == circle(PT(-2, 5), sqrt(10)));
-  // assert(c == circle(PT(1, 6), PT(-5, 4)));
-  // assert(c == circle(PT(-3, 2), PT(-3, 8), PT(-1, 8)));
-  // assert(c == incircle(PT(-12, 5), PT(3, 0), PT(0, 9)));
-  // assert(c.contains(PT(-2, 8)) && !c.contains(PT(-2, 9)));
-  // assert(c.on_edge(PT(-1, 2)) && !c.on_edge(PT(-1.01, 2)));
 
-  // pair<PT, PT> ct = circle_tangent(PT(0,0), 6, PT(10, 0), 6, 10);
-  // cout << ct.first << "\n" << ct.second << "\n";
+double rInCircle(double ab, double bc, double ca) {
+    return area(ab, bc, ca) / (0.5 * perimeter(ab, bc, ca));
+}
 
-  return 0;
+double rInCircle(PT a, PT b, PT c) {
+    return rInCircle(dist(a, b), dist(b, c), dist(c, a));
+}
+
+// returns 1 if there is an inCircle center, returns 0 otherwise
+// if this function returns 1, ctr will be the inCircle center
+// and r is the same as rInCircle
+int inCircle(PT p1, PT p2, PT p3, PT &ctr, double &r) {
+  r = rInCircle(p1, p2, p3);
+  if (fabs(r) < EPS) return 0;                   // no inCircle center
+
+  line l1, l2;                    // compute these two angle bisectors
+  double ratio = dist(p1, p2) / dist(p1, p3);
+  PT p = translate(p2, scale(toVec(p2, p3), ratio / (1 + ratio)));
+  pointsToLine(p1, p, l1);
+
+  ratio = dist(p2, p1) / dist(p2, p3);
+  p = translate(p1, scale(toVec(p1, p3), ratio / (1 + ratio)));
+  pointsToLine(p2, p, l2);
+
+  areIntersect(l1, l2, ctr);           // get their intersection point
+  return 1;
+}
+
+double rCircumCircle(double ab, double bc, double ca) {
+    return ab * bc * ca / (4.0 * area(ab, bc, ca));
+}
+
+double rCircumCircle(PT a, PT b, PT c) {
+    return rCircumCircle(dist(a, b), dist(b, c), dist(c, a));
+}
+
+// returns 1 if there is a circumCenter center, returns 0 otherwise
+// if this function returns 1, ctr will be the circumCircle center
+// and r is the same as rCircumCircle
+int circumCircle(PT p1, PT p2, PT p3, PT &ctr, double &r){
+    double a = p2.x - p1.x, b = p2.y - p1.y;
+    double c = p3.x - p1.x, d = p3.y - p1.y;
+    double e = a * (p1.x + p2.x) + b * (p1.y + p2.y);
+    double f = c * (p1.x + p3.x) + d * (p1.y + p3.y);
+    double g = 2.0 * (a * (p3.y - p2.y) - b * (p3.x - p2.x));
+    if (fabs(g) < EPS) return 0;
+
+    ctr.x = (d*e - b*f) / g;
+    ctr.y = (a*f - c*e) / g;
+    r = dist(p1, ctr);
+    return 1;
 }

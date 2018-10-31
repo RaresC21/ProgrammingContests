@@ -72,6 +72,16 @@ PT nearest_on_segment(const PT& p, const PT& a, const PT& b) {
     return a + (b - a)*r;
 }
 
+// project point c onto line segment through a and b
+PT ProjectPointSegment(PT a, PT b, PT c) {
+    double r = dot(b - a, b - a);
+    if (fabs(r) < EPS) return a;
+    r = dot(c - a, b - a) / r;
+    if (r < 0) return a;
+    if (r > 1) return b;
+    return a + (b - a)*r;
+}
+
 //  whether p is on segment a-b
 bool is_on_segment(const PT& p, const PT& a, const PT& b) {
     return abs(abs(a - p) + abs(b - p) - abs(a - b)) < eps;
@@ -201,6 +211,18 @@ bool simple(const vector<PT> &p) {
   return true;
 }
 
+// returns true if we always make the same turn while examining
+// all the edges of the polygon one by one
+bool is_convex(const vector<PT> &P) {
+    int sz = (int)P.size();
+    if (sz <= 3) return false;
+    bool isLeft = is_ccw(P[0], P[1], P[2]);
+    for (int i = 1; i < sz-1; i++)
+        if (is_ccw(P[i], P[i+1], P[(i+2) == sz ? 1 : i+2]) != isLeft)
+        return false;
+    return true;
+}
+
 //  area of a simple polygon p
 double area_polygon(const vector<PT> &p) {
     double area = 0;
@@ -231,4 +253,27 @@ template<class It> PT centroid(It lo, It hi) {
     ytot += lo->Y;
   }
   return PT(xtot / cnt, ytot / cnt);
+}
+
+// triangle stuff ------------------
+
+bool canFormTriangle(double a, double b, double c) {
+    return (a + b > c) && (a + c > b) && (b + c > a);
+}
+
+double area(double x1, double y1, double x2, double y2, double x3, double y3) {
+    return 0.5 * (x1 * y2 + x2 * y3 + x3 * y1 - x1 * y3 - x2 * y1 - x3 * y2);
+}
+
+double area(double ab, double bc, double ca) { // Heron's fomula
+    double s = 0.5 * (ab + bc + ca);
+    return sqrt(s) * sqrt(s - ab) * sqrt(s - bc) * sqrt(s - ca);
+}
+
+double area(PT a, PT b, PT c) {
+    return area(dist(a, b), dist(b, c), dist(c, a));
+}
+
+double perimeter(double ab, double ac, double bc) {
+    return ab + bc + ac;
 }
