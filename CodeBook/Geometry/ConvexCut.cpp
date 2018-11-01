@@ -28,6 +28,15 @@ vector<PT> convex_cut(It lo, It hi, const PT & p, const PT & q) {
   return res;
 }
 
+vector<PT> polygon_intersection(vector<PT>& p1, vector<PT>& p2) {
+  vector<PT> ans = p2;
+  for (int i = 0; i < p1.size(); i++) {
+    int ii = (i + 1) % p1.size();
+    ans = convex_cut(ans.begin(), ans.end(), p1[i], p1[ii]);
+  }
+  return ans;
+}
+
 int main() {
     vector<PT> polygon;
     vector<PT> cut = convex_cut(polygon.begin(), polygon.end(),
