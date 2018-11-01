@@ -1,25 +1,25 @@
-
 inline double area(double a, double b, const vector<vector<PT> >& v) {
     vector<pair<double, int> > event;
     int cnt = 0;
-    FOR(i,0,SZ(v)) {
-        FOR(k,0,SZ(v[i])) {
+    for (int i = 0; i < v.size(); i++) {
+      for (int k = 0; k < v[i].size(); k++) {
             PT p1 = v[i][k];
-            PT p2 = v[i][(k + 1) % SZ(v[i])];
+            PT p2 = v[i][(k + 1) % v[i].size()];
             if (p1.X > p2.X) swap(p1, p2);
             if (p1.X <= a && p2.X >= b) {
                 PT q1, q2;
-                lineline(p1, p2, PT(a,0), PT(a,100), q1);
-                lineline(p1, p2, PT(b,0), PT(b,100), q2);
+                line_line(p1, p2, PT(a,0), PT(a,100), q1);
+                line_line(p1, p2, PT(b,0), PT(b,100), q2);
                 double yy = ((q1.Y + q2.Y) / 2);
-                event.push_back((MP(yy, i)));
+                event.pb((mp(yy, i)));
             }
         }
     }
+
     sort(event.begin(), event.end());
     double ans = 0, amnt = 0;
     set<int> met;
-    FOR(i,0,SZ(event)) {
+    for (int i = 0; i < event.size(); i++) {
         double yy = event[i].A;
         int t = event[i].B;
         if (met.count(t)) {
@@ -38,22 +38,23 @@ inline double area(double a, double b, const vector<vector<PT> >& v) {
 }
 
 double polygon_union_area(const vector<vector<PT> >& v) {
-    int N = SZ(v);
+    int N = v.size();
     vector<double> xs;
     vector<pair<PT, PT> > all;
-    FOR(i,0,N) {
-        FOR(k,0,SZ(v[i])) {
-            int j = (k + 1) % SZ(v[i]);
-            all.push_back(MP(v[i][k], v[i][j]));
+    for (int i = 0; i < N; i++) {
+        for (int k = 0; k < v[i].size(); k++) {
+            int j = (k + 1) % v[i].size();
+            all.pb(mp(v[i][k], v[i][j]));
         }
     }
-    FOR(i,0,SZ(all)) {
-        xs.push_back(all[i].A.X);
-        FOR(k,0,i) {
+    for (int i = 0; i < all.size(); i++) {
+        xs.pb(all[i].A.X);
+        for (int k = 0; k < i; k++) {
             PT p;
-            if (lineline(all[i].A, all[i].B, all[k].A, all[k].B, p)) {
+            if (line_line(all[i].A, all[i].B, all[k].A, all[k].B, p)) {
+                // min and max values coordinates can take on
                 if (p.X >= 0 && p.X <= 1000 && p.Y <= 1000 && p.Y >= 0)
-                    xs.push_back(p.X);
+                    xs.pb(p.X);
             }
         }
     }
