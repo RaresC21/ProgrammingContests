@@ -87,6 +87,7 @@ bool is_on_segment(const PT& p, const PT& a, const PT& b) {
     return abs(abs(a - p) + abs(b - p) - abs(a - b)) < eps;
 }
 
+// specifically not collinear segments
 bool segments_intersect(const PT& a, const PT& b, const PT& p, const PT& q) {
   PT isect;
   if (line_line(a, b, p, q, isect)) {
@@ -101,63 +102,6 @@ PT reflect(const PT& p, const PT& a, const PT& b) {
     PT z = p - a;
     PT w = b - a;
     return conj(z / w) * w + a;
-}
-
-//  compute center of circle given three PTs
-PT circle_center(const PT& a, const PT& b, const PT& c) {
-    PT ab = (a + b) / double(2);
-    PT ac = (a + c) / double(2);
-    PT center;
-    line_line(ab, ab + rotate_ccw(a - b, PT(0, 0), M_PI/2), ac, ac + rotate_ccw( a - c, PT(0 ,0), M_PI/2), center);
-    return center;
-}
-
-//  intersection(s) of line a-b with circle @ c with radius r > 0
-vector <PT> line_circle(PT a, PT b, PT c, double r) {
-    vector<PT> ret;
-    b = b - a;
-    a = a - c;
-    double A = norm(b);
-    double B = dot(a, b);
-    double C = norm(a) - r*r;
-    double D = B*B - A*C;
-    if (D < -eps) return ret;
-    ret.push_back(c + a + b*(-B + sqrt(D + eps)) / A);
-    if (D > eps)
-        ret.push_back(c + a + b*(-B - sqrt(D)) / A);
-    return ret;
-}
-
-// compute intersection of circle centered at a with radius r
-// with circle centered at b with radius R
-vector<PT> circle_circle(PT c1, double r1, PT c2, double r2){
-    vector<PT> ret;
-    double d = abs(c1-c2);
-    if (d > r1 + r2 || d + min(r1, r2) < max(r1, r2)) return ret;
-    double x = (d*d - r2*r2 + r1*r1) / (2 * d);
-    double y = sqrt(r1*r1 - x*x);
-    PT v = (c2 - c1) / d;
-    ret.push_back(c1 + v*x + rotate_ccw(v, PT(0,0), M_PI/2)*y);
-    if (y > 0)
-        ret.push_back(c1 + v*x - rotate_ccw(v, PT(0,0), M_PI/2)*y);
-    return ret;
-}
-
-// Find tangent lines to circle center a and radius R1
-// and circle with center b and radius R2.
-// where R2 > R1
-typedef pair<PT, PT> Segment;
-pair<Segment,Segment> solve(PT a, double R1, PT b, double R2){
-  PT d = b.c - a.c;
-  double theta = acos((R2 - R1) / abs(d));
-
-  Segment a1, a2;
-  a1.A = a.c + d/PT(abs(d),0.0)*polar(1.0,theta)*R2;
-  a2.A = a.c + d/PT(abs(d),0.0)*polar(1.0,-theta)*R2;
-
-  a1.B = b.c + d/PT(abs(d),0.0)*polar(1.0,theta)*R1;
-  a2.B = b.c + d/PT(abs(d),0.0)*polar(1.0,-theta)*R1;
-  return make_pair(a1,a2);
 }
 
 //  whether PT a is on boundary of simple polygon p
@@ -178,7 +122,7 @@ bool is_in_polygon(const PT& a, const vector<PT> &p) {
     return abs(abs(sum) - 2*M_PI) < eps;
 }
 
-// O(log n)
+// O(log n) convex polygon
 bool in_polygon(const vector<PT>& v, const PT& p) {
   if (cross(v[1] - v[0], p - v[0]) < -eps ||
       cross(v[0] - v.back(), p - v.back()) < -eps) {

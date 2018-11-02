@@ -1,39 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define A first
-#define B second
-#define EQ(a, b) (fabs((a) - (b)) <= eps) /* equal to */
-#define LT(a, b) ((a) < (b) - eps)        /* less than */
-#define GT(a, b) ((a) > (b) + eps)        /* greater than */
-#define LT(a, b) ((a) < (b) - eps)         /* less than */
-#define LE(a, b) ((a) <= (b) + eps)        /* less than or equal to */
-#define NE(a, b) (fabs((a) - (b)) > eps)  /* not equal to */
-
-typedef complex<double> PT;
-typedef pair<PT, double> circle;
-const double PI = acos(-1);
-const double eps = 1e-9;
-#define X real()
-#define Y imag()
-#define MP make_pair
-
-double dot(PT a, PT b) { return real(conj(a) * b); }
-double cross(PT a, PT b) { return imag(conj(a) * b); }
-
-// rotate PT a around PT o by th radians
-PT rotate_ccw(const PT& a, const PT& o, double th) {
-    return (a-o) * polar(1.0, th) + o;
-}
-
-//  intersection of lines a1-a2 and b1-b2
-bool line_line(PT a1, PT a2, PT b1, PT b2, PT &isect) {
-    double d = cross(a2-a1, b2-b1);
-    if (abs(d) < eps) return false;
-    double t = cross(b2-b1, a1-b1) / d;
-    isect = a1 + (a2-a1)*t;
-    return true;
-}
+typedef pair<double> circle;
 
 // determine if point p is inside circle c.
 bool contains(const circle& c, const PT& p) {
@@ -50,30 +18,37 @@ vector <PT> line_circle(PT a, PT b, PT c, double r) {
     double C = norm(a) - r*r;
     double D = B*B - A*C;
     if (D < -eps) return ret;
-    ret.push_back(c + a + b*(-B + sqrt(D + eps)) / A);
+    ret.push_back(c + a + b*(-B + sqrt(D)) / A);
     if (D > eps)
         ret.push_back(c + a + b*(-B - sqrt(D)) / A);
     return ret;
 }
 
-// find two points of intersection between two circles
-// assumes that the circles indeed intersect.
-pair<PT, PT> circle_circle(const Circle& c1, const Circle& c2) {
-  double d = dist(c1.cntr, c2.cntr);
-  double theta = acos((c1.R*c1.R + d*d - c2.R*c2.R) / (2*c1.R*d));
-
-  PT b = c2.cntr - c1.cntr;
-  PT pt1 = rotate_ccw(b, theta) * (c1.R / d);
-  PT pt2 = rotate_ccw(pt1, 2*PI - 2*theta);
-  return make_pair(c1.cntr + pt1, c1.cntr + pt2);
+// compute intersection of circle centered at a with radius r
+// with circle centered at b with radius R
+vector<PT> circle_circle(const circle& a, const circle& b){
+  PT c1 = a.c, c2 = b.c;
+  double r1 = a.r, r2 = b.r;
+  vector<PT> ret;
+  double d = abs(c1-c2);
+  if (d > r1 + r2 || d + min(r1, r2) < max(r1, r2)) return ret;
+  double x = (d*d - r2*r2 + r1*r1) / (2 * d);
+  double y = sqrt(r1*r1 - x*x);
+  PT v = (c2 - c1) / d;
+  ret.push_back(c1 + v*x + rotate_ccw(v, PT(0,0), PI/2)*y);
+  if (y > 0)
+      ret.push_back(c1 + v*x - rotate_ccw(v, PT(0,0), PI/2)*y);
+  return ret;
 }
 
 //  compute center of circle given three points
+// assume points are not collinear
 pair<PT, double> circle_center(const PT& a, const PT& b, const PT& c) {
     PT ab = (a + b) / double(2);
     PT ac = (a + c) / double(2);
     PT center;
-    line_line(ab, ab + rotate_ccw(a - b, PT(0, 0), M_PI/2), ac, ac + rotate_ccw( a - c, PT(0 ,0), M_PI/2), center);
+    line_line(ab, ab + rotate_ccw(a - b, PT(0, 0), M_PI/2),
+              ac, ac + rotate_ccw(a - c, PT(0 ,0), M_PI/2), center);
     return MP(center, abs(center - a));
 }
 
@@ -100,7 +75,7 @@ pair<PT, double> circle_center(const PT& a, const PT& b) {
 }
 
 typedef pair<PT, PT> Segment;
-pair<Segment,Segment> solve(circle a, circle b){
+pair<Segment,Segment> outer_tangent(circle a, circle b){
   double R2 = a.B;
   double R1 = b.B;
   PT d = b.A - a.A;
@@ -115,9 +90,28 @@ pair<Segment,Segment> solve(circle a, circle b){
   return make_pair(a1,a2);
 }
 
-// find center of a circle of radius R that is tangent to both circles centered
-// at a and b with radii r1, r2, respectively.
-pair<PT, PT> circle_tangent(PT a, double r1, PT b, double r2, double R) {
+bool inner_tangent(circle a, circle b, pair<Segment, Segment>& tangents) {
+  double d = abs(a.A - b.A);
+  double R1 = a.B, R2 = b.B;
+  if (d - R1 - R2 < eps) return false;
+
+  double x = d * R1 / (R1 + R2);
+  double theta = acos(R1 / x);
+
+  PT p1 = rotate_ccw(b.A, a.A, theta); p1 = a.A + (p1 - a.A) * (R1 / abs(p1 - a.A));
+  PT p2 = rotate_ccw(a.A, b.A, theta); p2 = b.A + (p2 - b.A) * (R2 / abs(p2 - b.A));
+  tangents.A = mp(p1, p2);
+
+  PT q1 = rotate_ccw(b.A, a.A, -theta); q1 = a.A + (q1 - a.A) * (R1 / abs(q1 - a.A));
+  PT q2 = rotate_ccw(a.A, b.A, -theta); q2 = b.A + (q2 - b.A) * (R2 / abs(q2 - b.A));
+  tangents.B = mp(q1, q2);
+  return true;
+}
+
+// find center of a circle of radius R that is tangent to both circles
+pair<PT, PT> circle_tangent(circle c1, circle c2, double R) {
+  PT a = c1.A, b = c2.A;
+  double r1 = c1.B, r2 = c2.B;
   double v = R + r2;
   double u = R + r1;
   double d = abs(a - b);
@@ -162,7 +156,6 @@ double spherical_cap_volume(double R, double h) {
 double spherical_cap_area(double R, double h) {
     return 2 * PI * R * h;
 }
-
 
 double rInCircle(double ab, double bc, double ca) {
     return area(ab, bc, ca) / (0.5 * perimeter(ab, bc, ca));
