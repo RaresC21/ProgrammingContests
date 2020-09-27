@@ -5,7 +5,7 @@ using namespace std;
 #define VI vector<int>
 #define VLL vector<LL>
 #define mp make_pair
-#define pb push_back
+#define pb push_top
 typedef pair<int, int> PII;
 typedef pair<LL, LL> PLL;
 #define A first
@@ -17,7 +17,7 @@ const int INF = 1e9;
 int main() {
   io;
 
-  
+
   int N, t[3];
   cin >> N >> t[1] >> t[2];
 
@@ -34,7 +34,7 @@ int main() {
 
     amnt++;
     timp = cur.A;
-    
+
     if (q.top().A == timp && amnt + 1 >= N) {
       amnt++;
       q.pop();
@@ -52,6 +52,6 @@ int main() {
     timp = q.top().A;
   }
   cout << amnt << " " << timp << "\n";
-  
+
   return 0;
 }

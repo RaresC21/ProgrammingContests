@@ -31,7 +31,7 @@ public:
 };
 
 void SegTree::build(int node, int start, int end, bool is_or) {
-    if (start == end) { // leaf node
+    if (start == end) {
         tree[node] = A[start];
         return;
     }
@@ -42,7 +42,7 @@ void SegTree::build(int node, int start, int end, bool is_or) {
 
     if (is_or)
         tree[node] = tree[2 * node] | tree[2 * node + 1];
-    else 
+    else
         tree[node] = tree[2 * node] ^ tree[2 * node + 1];
 }
 
